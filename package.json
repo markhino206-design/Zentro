@@ -1,0 +1,15 @@
+{
+  "name": "zentro-marketplace",
+  "private": true,
+  "workspaces": [
+    "apps/frontend",
+    "apps/api-gateway",
+    "apps/services/*"
+  ],
+  "scripts": {
+    "lint": "echo 'configure lint by package'",
+    "test": "bash scripts/validate-structure.sh",
+    "build": "echo 'configure builds by package'",
+    "check:structure": "bash scripts/validate-structure.sh"
+  }
+}
