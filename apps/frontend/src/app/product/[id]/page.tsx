@@ -1,11 +1,17 @@
-import { notFound } from 'next/navigation';
+'use client';
+
+import { notFound, useRouter } from 'next/navigation';
 import { ProductGallery } from '../../../components/ProductGallery';
 import { SellerCard } from '../../../components/SellerCard';
 import { ProductCard } from '../../../components/ProductCard';
-import { calculateCommission, getSellerById, products, recommendations } from '../../../lib/marketplace';
+import { calculateCommission, canSellerPublish, getSellerById, products, recommendations } from '../../../lib/marketplace';
+import { useCart } from '../../../context/CartContext';
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
   const product = products.find((p) => p.id === params.id);
+  const router = useRouter();
+  const { addToCart } = useCart();
+
   if (!product) return notFound();
 
   const seller = getSellerById(product.sellerId);
@@ -24,17 +30,20 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
           <h1 className="text-2xl font-extrabold">{product.title}</h1>
           <p className="mt-2 text-3xl font-extrabold text-blue-600">${product.price}</p>
           <p className="mt-1 text-sm text-slate-600">Stock: {product.stock > 0 ? 'Disponible' : 'Sin stock'}</p>
+          <p className="text-sm text-slate-600">Condición declarada: {product.condition}</p>
           <p className="mt-4 text-slate-700">{product.description}</p>
           <div className="mt-4 rounded-xl bg-slate-50 p-3 text-sm text-slate-600">
+            <p>Escrow protegido por Zentro</p>
             <p>Comisión marketplace: {(commission.rate * 100).toFixed(0)}%</p>
             <p>Neto vendedor: ${commission.sellerNet}</p>
+            <p>Seller verified to publish: {canSellerPublish(product.sellerId) ? 'Yes' : 'No'}</p>
           </div>
         </div>
         <div className="space-y-3 lg:col-span-3">
           <SellerCard seller={seller} />
           <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <button className="mb-2 w-full rounded-xl bg-blue-600 px-4 py-2 font-semibold text-white">Buy Now</button>
-            <button className="w-full rounded-xl bg-emerald-500 px-4 py-2 font-semibold text-white">Add to Cart</button>
+            <button onClick={() => router.push('/checkout')} className="mb-2 w-full rounded-xl bg-blue-600 px-4 py-2 font-semibold text-white">Buy Now</button>
+            <button onClick={() => addToCart(product)} className="w-full rounded-xl bg-emerald-500 px-4 py-2 font-semibold text-white">Add to Cart</button>
           </div>
         </div>
       </section>

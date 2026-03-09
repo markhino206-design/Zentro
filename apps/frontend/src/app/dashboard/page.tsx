@@ -1,8 +1,9 @@
-import { products } from '../../lib/marketplace';
+import { canSellerPublish, products } from '../../lib/marketplace';
 
 export default function SellerDashboardPage() {
   const revenue = products.reduce((a, p) => a + p.salesVolume * p.price, 0);
   const sold = products.reduce((a, p) => a + p.salesVolume, 0);
+  const verifiedPublish = canSellerPublish('s1');
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-6">
@@ -13,8 +14,12 @@ export default function SellerDashboardPage() {
         <div className="rounded-2xl bg-white p-4 shadow-sm">Orders received: {(sold * 0.92).toLocaleString()}</div>
       </section>
       <section className="mt-6 rounded-2xl bg-white p-4 shadow-sm">
-        <h2 className="font-bold">Product management</h2>
-        <p className="text-slate-600">Add, edit, delete products and manage seller orders (UI scaffold).</p>
+        <h2 className="font-bold">Seller verification gate</h2>
+        <p className="text-slate-600">Can publish products: {verifiedPublish ? 'Yes (verified)' : 'No (verification required)'}</p>
+      </section>
+      <section className="mt-6 rounded-2xl bg-white p-4 shadow-sm">
+        <h2 className="font-bold">Product & order management</h2>
+        <p className="text-slate-600">Add/edit/delete products, view orders, and monitor revenue conversion.</p>
       </section>
     </main>
   );

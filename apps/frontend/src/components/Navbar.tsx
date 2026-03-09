@@ -17,8 +17,10 @@ export function Navbar() {
           placeholder="Buscar en Zentro"
         />
         <nav className="hidden gap-4 text-sm text-slate-700 md:flex">
-          <Link href="/dashboard">Vender</Link>
+          <Link href="/buyer">Comprador</Link>
+          <Link href="/dashboard">Vendedor</Link>
           <Link href="/admin">Admin</Link>
+          <Link href="/terms">Términos</Link>
         </nav>
         <Link href="/cart" className="rounded-xl bg-slate-900 px-3 py-2 text-sm text-white">
           Cart ({count})

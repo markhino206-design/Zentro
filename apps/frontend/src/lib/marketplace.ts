@@ -1,3 +1,23 @@
+export type UserRole = 'buyer' | 'seller' | 'admin';
+
+export type User = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  nationalId: string;
+  phone: string;
+  email: string;
+  passwordHash: string;
+  address: string;
+  city: string;
+  country: string;
+  roles: UserRole[];
+  emailVerified: boolean;
+  smsVerified: boolean;
+  isBanned: boolean;
+  fraudFlags: number;
+};
+
 export type Seller = {
   id: string;
   name: string;
@@ -5,7 +25,13 @@ export type Seller = {
   reviews: number;
   sales: number;
   location: string;
+  verified: boolean;
+  governmentIdVerified: boolean;
+  phoneVerified: boolean;
+  fullAddressVerified: boolean;
 };
+
+export type ProductCondition = 'new' | 'refurbished' | 'used';
 
 export type Product = {
   id: string;
@@ -17,17 +43,99 @@ export type Product = {
   images: string[];
   stock: number;
   sellerId: string;
+  condition: ProductCondition;
   productRating: number;
   salesVolume: number;
   views: number;
 };
 
+export type EscrowStatus =
+  | 'pending_payment'
+  | 'payment_secured_escrow'
+  | 'seller_shipping_to_reception'
+  | 'verification_in_reception_center'
+  | 'shipping_to_buyer'
+  | 'delivered'
+  | 'refunded';
+
+export type EscrowTransaction = {
+  id: string;
+  orderId: string;
+  buyerId: string;
+  sellerId: string;
+  amount: number;
+  commissionRate: number;
+  status: EscrowStatus;
+};
+
+export type ReceptionReview = {
+  orderId: string;
+  productId: string;
+  listingCondition: ProductCondition;
+  receivedCondition: ProductCondition;
+  approved: boolean;
+  notes: string;
+};
+
 export const commissionConfig = { min: 0.05, max: 0.1, default: 0.08 };
 
+export const users: User[] = [
+  {
+    id: 'u1',
+    firstName: 'Lucía',
+    lastName: 'Pérez',
+    nationalId: 'AR-12345678',
+    phone: '+541112223333',
+    email: 'lucia@zentro.com',
+    passwordHash: 'bcrypt$mock',
+    address: 'Av. Siempre Viva 123',
+    city: 'Buenos Aires',
+    country: 'Argentina',
+    roles: ['buyer', 'seller'],
+    emailVerified: true,
+    smsVerified: true,
+    isBanned: false,
+    fraudFlags: 0
+  }
+];
+
 export const sellers: Seller[] = [
-  { id: 's1', name: 'NovaTech', rating: 4.8, reviews: 3520, sales: 14800, location: 'Buenos Aires' },
-  { id: 's2', name: 'UrbanHome', rating: 4.5, reviews: 1940, sales: 8400, location: 'CDMX' },
-  { id: 's3', name: 'EcoStyle', rating: 4.7, reviews: 1220, sales: 5600, location: 'Bogotá' }
+  {
+    id: 's1',
+    name: 'NovaTech',
+    rating: 4.8,
+    reviews: 3520,
+    sales: 14800,
+    location: 'Buenos Aires',
+    verified: true,
+    governmentIdVerified: true,
+    phoneVerified: true,
+    fullAddressVerified: true
+  },
+  {
+    id: 's2',
+    name: 'UrbanHome',
+    rating: 4.5,
+    reviews: 1940,
+    sales: 8400,
+    location: 'CDMX',
+    verified: true,
+    governmentIdVerified: true,
+    phoneVerified: true,
+    fullAddressVerified: true
+  },
+  {
+    id: 's3',
+    name: 'EcoStyle',
+    rating: 4.7,
+    reviews: 1220,
+    sales: 5600,
+    location: 'Bogotá',
+    verified: false,
+    governmentIdVerified: false,
+    phoneVerified: true,
+    fullAddressVerified: false
+  }
 ];
 
 export const products: Product[] = [
@@ -41,6 +149,7 @@ export const products: Product[] = [
     images: ['https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200'],
     stock: 18,
     sellerId: 's1',
+    condition: 'new',
     productRating: 4.7,
     salesVolume: 7200,
     views: 54000
@@ -55,6 +164,7 @@ export const products: Product[] = [
     images: ['https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=1200'],
     stock: 120,
     sellerId: 's1',
+    condition: 'new',
     productRating: 4.6,
     salesVolume: 9800,
     views: 63000
@@ -69,6 +179,7 @@ export const products: Product[] = [
     images: ['https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=1200'],
     stock: 45,
     sellerId: 's2',
+    condition: 'refurbished',
     productRating: 4.4,
     salesVolume: 3100,
     views: 28000
@@ -83,42 +194,29 @@ export const products: Product[] = [
     images: ['https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1200'],
     stock: 78,
     sellerId: 's3',
+    condition: 'used',
     productRating: 4.5,
     salesVolume: 4700,
     views: 34000
-  },
-  {
-    id: 'p5',
-    title: 'Monitor UltraWide 34"',
-    description: 'Monitor QHD 165Hz para productividad y gaming profesional.',
-    shortDescription: 'QHD, 165Hz, ultrawide.',
-    price: 649,
-    category: 'Tecnología',
-    images: ['https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=1200'],
-    stock: 22,
-    sellerId: 's1',
-    productRating: 4.8,
-    salesVolume: 2600,
-    views: 41000
-  },
-  {
-    id: 'p6',
-    title: 'Lámpara Aura Minimal',
-    description: 'Lámpara inteligente con escenas de color y control por app.',
-    shortDescription: 'RGB, smart home.',
-    price: 59,
-    category: 'Hogar',
-    images: ['https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1200'],
-    stock: 140,
-    sellerId: 's2',
-    productRating: 4.3,
-    salesVolume: 3900,
-    views: 26000
   }
 ];
 
 export function getSellerById(id: string) {
   return sellers.find((s) => s.id === id);
+}
+
+export function isValidNationalId(nationalId: string) {
+  return /^[A-Z]{2}-\d{7,10}$/.test(nationalId);
+}
+
+export function canRegisterUser(payload: Pick<User, 'email' | 'nationalId' | 'phone'>) {
+  const duplicate = users.find((u) => u.email === payload.email || u.nationalId === payload.nationalId || u.phone === payload.phone);
+  return !duplicate && isValidNationalId(payload.nationalId);
+}
+
+export function canSellerPublish(sellerId: string) {
+  const seller = getSellerById(sellerId);
+  return Boolean(seller?.verified && seller?.governmentIdVerified && seller?.phoneVerified && seller?.fullAddressVerified);
 }
 
 export function calculateRankingScore(product: Product) {
@@ -144,14 +242,46 @@ export function recommendations(product: Product) {
 }
 
 export function calculateCommission(price: number, rate = commissionConfig.default) {
-  const commission = Number((price * rate).toFixed(2));
-  return { commission, sellerNet: Number((price - commission).toFixed(2)), rate };
+  const safeRate = Math.min(commissionConfig.max, Math.max(commissionConfig.min, rate));
+  const commission = Number((price * safeRate).toFixed(2));
+  return { commission, sellerNet: Number((price - commission).toFixed(2)), rate: safeRate };
+}
+
+export function createEscrow(orderId: string, buyerId: string, sellerId: string, amount: number): EscrowTransaction {
+  return {
+    id: `escrow-${orderId}`,
+    orderId,
+    buyerId,
+    sellerId,
+    amount,
+    commissionRate: commissionConfig.default,
+    status: 'payment_secured_escrow'
+  };
+}
+
+export function receptionCenterReview(review: ReceptionReview) {
+  const approved = review.listingCondition === review.receivedCondition;
+  return {
+    ...review,
+    approved,
+    notes: approved ? 'Condition matches listing. Ship to buyer and release escrow.' : 'Condition mismatch. Return to seller and refund buyer.'
+  };
 }
 
 export function fraudFlags() {
   return [
     { id: 'f1', type: 'Fake reviews', severity: 'high', entity: 'seller:s2', note: 'Picos anormales de reseñas en 24h.' },
-    { id: 'f2', type: 'Abnormal order activity', severity: 'medium', entity: 'seller:s3', note: 'Pedidos repetitivos desde misma IP.' },
-    { id: 'f3', type: 'Suspicious seller behavior', severity: 'low', entity: 'seller:s1', note: 'Cambios de precios extremos.' }
+    { id: 'f2', type: 'Abnormal order activity', severity: 'medium', entity: 'buyer:u44', note: 'Intentos de pago fallidos repetidos.' },
+    { id: 'f3', type: 'Suspicious seller behavior', severity: 'high', entity: 'seller:s3', note: 'Producto enviado no coincide con descripción.' }
+  ];
+}
+
+export function enforceFraudRules() {
+  return [
+    { rule: 'payment_failed', action: 'cancel_order' },
+    { rule: 'repeated_payment_refusal', action: 'flag_buyer' },
+    { rule: 'buyer_scam_attempt', action: 'ban_buyer' },
+    { rule: 'seller_wrong_product', action: 'flag_seller' },
+    { rule: 'repeated_fraud', action: 'ban_user' }
   ];
 }
