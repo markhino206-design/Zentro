@@ -3,11 +3,13 @@
 import Link from 'next/link';
 import { useCart } from '../context/CartContext';
 import { useI18n } from '../context/I18nContext';
+import { useAuth } from '../context/AuthContext';
 import { LanguageSelector } from './LanguageSelector';
 
 export function Navbar() {
   const { count } = useCart();
   const { t } = useI18n();
+  const { user, logout } = useAuth();
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
@@ -22,10 +24,15 @@ export function Navbar() {
           <Link href="/chat">{t('chat')}</Link>
           <Link href="/search">Search</Link>
           <Link href="/disputes">Disputes</Link>
-          <Link href="/admin">{t('admin')}</Link>
           <Link href="/terms">{t('terms')}</Link>
+          <Link href="/account">My Account</Link>
         </nav>
         <LanguageSelector />
+        {!user ? (
+          <Link href="/login" className="rounded-xl border border-slate-300 px-3 py-2 text-sm">Login</Link>
+        ) : (
+          <button onClick={logout} className="rounded-xl border border-slate-300 px-3 py-2 text-sm">Logout</button>
+        )}
         <Link href="/cart" className="rounded-xl bg-slate-900 px-3 py-2 text-sm text-white">
           {t('cart')} ({count})
         </Link>

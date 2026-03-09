@@ -1,6 +1,22 @@
+'use client';
+
+import { useState } from 'react';
 import { bannedAccounts, enforceFraudRules, fraudFlags, logisticsQuote, products, sellers, users, createEscrow, receptionCenterReview, securityChecklist } from '../../lib/marketplace';
 
 export default function AdminPage() {
+  const [token, setToken] = useState('');
+  const authorized = token === 'internal-admin-access';
+
+  if (!authorized) {
+    return (
+      <main className="mx-auto max-w-xl px-4 py-6">
+        <h1 className="text-2xl font-extrabold">Restricted Admin Access</h1>
+        <p className="text-sm text-slate-600">Admin panel is not publicly exposed. Internal authentication is required.</p>
+        <input value={token} onChange={(e) => setToken(e.target.value)} placeholder="Internal admin token" className="mt-3 w-full rounded border p-2" />
+      </main>
+    );
+  }
+
   const totalSales = products.reduce((a, p) => a + p.salesVolume * p.price, 0);
   const commissions = totalSales * 0.08;
   const escrow = createEscrow('ord-1001', 'u1', 's1', 899);
@@ -16,25 +32,6 @@ export default function AdminPage() {
         <div className="rounded-2xl bg-white p-4 shadow-sm">Active listings: {products.length}</div>
         <div className="rounded-2xl bg-white p-4 shadow-sm">Fraud alerts: {fraudFlags().length}</div>
         <div className="rounded-2xl bg-white p-4 shadow-sm">Commission (8%): ${commissions.toLocaleString()}</div>
-      </section>
-
-      <section className="mt-6 rounded-2xl bg-white p-4 shadow-sm">
-        <h2 className="font-bold">Admin controls</h2>
-        <ul className="mt-2 list-disc pl-5 text-sm text-slate-700">
-          <li>Approve sellers</li>
-          <li>Ban users (fake payments, fake listings, repeated complaints)</li>
-          <li>Resolve disputes and escrow releases/refunds</li>
-          <li>Manage ads and remove products</li>
-        </ul>
-      </section>
-
-      <section className="mt-6 rounded-2xl border border-rose-100 bg-rose-50 p-4">
-        <h2 className="font-bold text-rose-700">Fraud protection alerts</h2>
-        <ul className="mt-2 space-y-2">
-          {fraudFlags().map((flag) => (
-            <li key={flag.id} className="rounded bg-white p-3 text-sm"><b>{flag.type}</b> ({flag.severity}) - {flag.entity}: {flag.note}</li>
-          ))}
-        </ul>
       </section>
 
       <section className="mt-6 rounded-2xl bg-white p-4 shadow-sm">
@@ -56,7 +53,7 @@ export default function AdminPage() {
       </section>
 
       <section className="mt-6 rounded-2xl bg-white p-4 shadow-sm">
-        <h2 className="font-bold">Reception Center & Logistics status</h2>
+        <h2 className="font-bold">Reception & Escrow</h2>
         <p className="text-sm text-slate-700">Order {reception.orderId}: {reception.notes}</p>
         <p className="text-sm text-slate-700">Escrow tx: {escrow.id} ({escrow.status})</p>
         <p className="text-sm text-slate-700">Verified sellers: {sellers.filter((s) => s.verified).length}/{sellers.length}</p>

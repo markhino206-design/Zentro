@@ -1,49 +1,43 @@
 'use client';
 
 import { useState } from 'react';
-import { canRegisterUser, isStrongPassword, isValidNationalId, validateCaptcha } from '../../lib/marketplace';
+import { isValidNationalId, isStrongPassword, validateCaptcha } from '../../lib/marketplace';
+import { useAuth } from '../../context/AuthContext';
 
 export default function RegisterPage() {
+  const { register } = useAuth();
   const [result, setResult] = useState<string>('');
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-6">
-      <h1 className="text-2xl font-extrabold">Registro seguro de cuenta</h1>
+      <h1 className="text-2xl font-extrabold">Secure Account Registration</h1>
       <form
         className="mt-4 grid grid-cols-1 gap-3 rounded-2xl bg-white p-5 shadow-sm md:grid-cols-2"
         onSubmit={(e) => {
           e.preventDefault();
           const form = new FormData(e.currentTarget);
+          const firstName = String(form.get('firstName'));
+          const lastName = String(form.get('lastName'));
           const nationalId = String(form.get('nationalId'));
-          const email = String(form.get('email'));
           const phone = String(form.get('phone'));
+          const email = String(form.get('email'));
           const password = String(form.get('password'));
           const captchaToken = String(form.get('captchaToken'));
 
-          if (!validateCaptcha(captchaToken)) {
-            setResult('CAPTCHA inválido. Reintenta para continuar.');
-            return;
-          }
-          if (!isValidNationalId(nationalId)) {
-            setResult('Formato de documento inválido. Use formato CC-12345678');
-            return;
-          }
-          if (!isStrongPassword(password)) {
-            setResult('Password débil. Requiere 10+ caracteres, mayúscula, minúscula, número y símbolo.');
-            return;
-          }
+          if (!validateCaptcha(captchaToken)) return setResult('Invalid CAPTCHA.');
+          if (!isValidNationalId(nationalId)) return setResult('Invalid identity document format (e.g. AR-12345678).');
+          if (!isStrongPassword(password)) return setResult('Weak password.');
 
-          const allowed = canRegisterUser({ nationalId, email, phone });
-          setResult(allowed ? 'Cuenta válida. Se requiere verificación de email (y SMS opcional).' : 'Cuenta duplicada o inválida.');
+          setResult(register({ firstName, lastName, email, password, nationalId, phone }));
         }}
       >
-        <input name="firstName" required placeholder="First name" className="rounded border p-2" />
-        <input name="lastName" required placeholder="Last name" className="rounded border p-2" />
-        <input name="nationalId" required placeholder="Identity document (AR-12345678)" className="rounded border p-2" />
-        <input name="phone" required placeholder="Phone" className="rounded border p-2" />
+        <input name="firstName" required placeholder="First Name" className="rounded border p-2" />
+        <input name="lastName" required placeholder="Last Name" className="rounded border p-2" />
+        <input name="nationalId" required placeholder="Identity Document Number" className="rounded border p-2" />
+        <input name="phone" required placeholder="Phone Number" className="rounded border p-2" />
         <input name="email" type="email" required placeholder="Email" className="rounded border p-2" />
-        <input name="password" type="password" required placeholder="Strong password" className="rounded border p-2" />
-        <input name="address" required placeholder="Full address" className="rounded border p-2" />
+        <input name="password" type="password" required placeholder="Password" className="rounded border p-2" />
+        <input name="address" required placeholder="Full Address" className="rounded border p-2" />
         <input name="city" required placeholder="City" className="rounded border p-2" />
         <input name="country" required placeholder="Country" className="rounded border p-2" />
         <input name="captchaToken" required placeholder="CAPTCHA token (mock)" className="rounded border p-2" />
