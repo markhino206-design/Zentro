@@ -1,0 +1,21 @@
+{
+  "name": "zentro-marketplace",
+  "private": true,
+  "workspaces": [
+    "apps/frontend",
+    "apps/api-gateway",
+    "apps/services/*"
+  ],
+  "scripts": {
+    "lint": "echo 'configure lint by package'",
+    "test": "bash scripts/validate-structure.sh",
+    "build": "echo 'configure builds by package'",
+    "check:structure": "bash scripts/validate-structure.sh",
+    "dev": "npm run dev -w @zentro/frontend",
+    "start": "npm run start -w @zentro/frontend"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}
