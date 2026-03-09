@@ -85,7 +85,8 @@ export type ChatMessage = {
   flaggedSpam: boolean;
 };
 
-export const commissionConfig = { min: 0.05, max: 0.1, default: 0.08 };
+export const commissionConfig = { min: 0.08, max: 0.08, default: 0.08 };
+export const publicationFeeUSD = 2;
 
 export const users: User[] = [
   {
@@ -229,4 +230,50 @@ export function bannedAccounts() {
 
 export function securityChecklist() {
   return ['bcrypt password hashing', 'input validation', 'SQL injection protection', 'XSS protection', 'CSRF protection', 'rate limiting', 'brute-force login protection'];
+}
+
+
+export function calculatePublicationCharge(listings: number) {
+  return Number((publicationFeeUSD * Math.max(0, listings)).toFixed(2));
+}
+
+export function searchProducts(query: string, filters?: { category?: string; minPrice?: number; maxPrice?: number; minRating?: number }) {
+  const q = query.trim().toLowerCase();
+  return rankedProducts().filter((p) => {
+    const seller = getSellerById(p.sellerId);
+    const matchText = !q || p.title.toLowerCase().includes(q) || p.description.toLowerCase().includes(q);
+    const matchCategory = !filters?.category || p.category === filters.category;
+    const matchMin = filters?.minPrice == null || p.price >= filters.minPrice;
+    const matchMax = filters?.maxPrice == null || p.price <= filters.maxPrice;
+    const matchRating = filters?.minRating == null || (seller?.rating ?? 0) >= filters.minRating;
+    return matchText && matchCategory && matchMin && matchMax && matchRating;
+  });
+}
+
+export function paymentProviders() {
+  return ['Stripe', 'PayPal', 'MercadoPago'];
+}
+
+export function promotionPlans() {
+  return [
+    { id: 'promo1', name: 'Featured listing', priceUSD: 4.99 },
+    { id: 'promo2', name: 'Promoted search result', priceUSD: 7.99 },
+    { id: 'promo3', name: 'Homepage promotion', priceUSD: 12.99 }
+  ];
+}
+
+export function logisticsQuote(distanceKm: number, weightKg: number) {
+  const base = 4.5;
+  const cost = base + distanceKm * 0.08 + weightKg * 0.9;
+  return {
+    cost: Number(cost.toFixed(2)),
+    trackingCode: `ZTRK-${Math.floor(distanceKm * 100 + weightKg * 10)}`
+  };
+}
+
+export function disputes() {
+  return [
+    { id: 'd1', orderId: 'ord-777', status: 'open', reason: 'Item condition mismatch' },
+    { id: 'd2', orderId: 'ord-778', status: 'resolved', reason: 'Late delivery' }
+  ];
 }

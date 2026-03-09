@@ -1,18 +1,21 @@
-import { bannedAccounts, enforceFraudRules, fraudFlags, products, sellers, users, createEscrow, receptionCenterReview, securityChecklist } from '../../lib/marketplace';
+import { bannedAccounts, enforceFraudRules, fraudFlags, logisticsQuote, products, sellers, users, createEscrow, receptionCenterReview, securityChecklist } from '../../lib/marketplace';
 
 export default function AdminPage() {
   const totalSales = products.reduce((a, p) => a + p.salesVolume * p.price, 0);
+  const commissions = totalSales * 0.08;
   const escrow = createEscrow('ord-1001', 'u1', 's1', 899);
   const reception = receptionCenterReview({ orderId: 'ord-1001', productId: 'p1', listingCondition: 'new', receivedCondition: 'new', approved: true, notes: '' });
+  const logistics = logisticsQuote(120, 1.5);
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-6">
       <h1 className="text-2xl font-extrabold">Admin Panel</h1>
-      <section className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-4">
+      <section className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-5">
         <div className="rounded-2xl bg-white p-4 shadow-sm">Total sales: ${totalSales.toLocaleString()}</div>
         <div className="rounded-2xl bg-white p-4 shadow-sm">Total users: {users.length}</div>
         <div className="rounded-2xl bg-white p-4 shadow-sm">Active listings: {products.length}</div>
         <div className="rounded-2xl bg-white p-4 shadow-sm">Fraud alerts: {fraudFlags().length}</div>
+        <div className="rounded-2xl bg-white p-4 shadow-sm">Commission (8%): ${commissions.toLocaleString()}</div>
       </section>
 
       <section className="mt-6 rounded-2xl bg-white p-4 shadow-sm">
@@ -29,9 +32,7 @@ export default function AdminPage() {
         <h2 className="font-bold text-rose-700">Fraud protection alerts</h2>
         <ul className="mt-2 space-y-2">
           {fraudFlags().map((flag) => (
-            <li key={flag.id} className="rounded bg-white p-3 text-sm">
-              <b>{flag.type}</b> ({flag.severity}) - {flag.entity}: {flag.note}
-            </li>
+            <li key={flag.id} className="rounded bg-white p-3 text-sm"><b>{flag.type}</b> ({flag.severity}) - {flag.entity}: {flag.note}</li>
           ))}
         </ul>
       </section>
@@ -49,18 +50,17 @@ export default function AdminPage() {
         <h2 className="font-bold">Automated anti-fraud rules</h2>
         <ul className="mt-2 grid grid-cols-1 gap-2 md:grid-cols-2">
           {enforceFraudRules().map((rule) => (
-            <li key={rule.rule} className="rounded bg-slate-50 p-2 text-sm">
-              {rule.rule} → <b>{rule.action}</b>
-            </li>
+            <li key={rule.rule} className="rounded bg-slate-50 p-2 text-sm">{rule.rule} → <b>{rule.action}</b></li>
           ))}
         </ul>
       </section>
 
       <section className="mt-6 rounded-2xl bg-white p-4 shadow-sm">
-        <h2 className="font-bold">Reception Center status</h2>
+        <h2 className="font-bold">Reception Center & Logistics status</h2>
         <p className="text-sm text-slate-700">Order {reception.orderId}: {reception.notes}</p>
         <p className="text-sm text-slate-700">Escrow tx: {escrow.id} ({escrow.status})</p>
         <p className="text-sm text-slate-700">Verified sellers: {sellers.filter((s) => s.verified).length}/{sellers.length}</p>
+        <p className="text-sm text-slate-700">Logistics quote sample: ${logistics.cost} · tracking {logistics.trackingCode}</p>
       </section>
 
       <section className="mt-6 rounded-2xl bg-white p-4 shadow-sm">

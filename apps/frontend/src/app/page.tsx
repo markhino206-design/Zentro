@@ -17,6 +17,7 @@ export default function HomePage() {
         <p className="max-w-2xl text-blue-100">Compra y vende con escrow, recepción verificada y protección anti-fraude.</p>
         <div className="mt-3 flex gap-2">
           <Link href="/register" className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-blue-600">Crear cuenta verificada</Link>
+          <Link href="/search" className="rounded-lg border border-blue-200 px-4 py-2 text-sm font-semibold text-white">Buscar productos</Link>
           <Link href="/terms" className="rounded-lg border border-blue-200 px-4 py-2 text-sm font-semibold text-white">Ver términos</Link>
         </div>
       </section>
