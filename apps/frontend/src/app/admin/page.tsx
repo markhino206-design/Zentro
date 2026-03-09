@@ -1,24 +1,18 @@
-import { enforceFraudRules, fraudFlags, products, sellers, users, createEscrow, receptionCenterReview } from '../../lib/marketplace';
+import { bannedAccounts, enforceFraudRules, fraudFlags, products, sellers, users, createEscrow, receptionCenterReview, securityChecklist } from '../../lib/marketplace';
 
 export default function AdminPage() {
   const totalSales = products.reduce((a, p) => a + p.salesVolume * p.price, 0);
   const escrow = createEscrow('ord-1001', 'u1', 's1', 899);
-  const reception = receptionCenterReview({
-    orderId: 'ord-1001',
-    productId: 'p1',
-    listingCondition: 'new',
-    receivedCondition: 'new',
-    approved: true,
-    notes: ''
-  });
+  const reception = receptionCenterReview({ orderId: 'ord-1001', productId: 'p1', listingCondition: 'new', receivedCondition: 'new', approved: true, notes: '' });
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-6">
       <h1 className="text-2xl font-extrabold">Admin Panel</h1>
-      <section className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+      <section className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-4">
         <div className="rounded-2xl bg-white p-4 shadow-sm">Total sales: ${totalSales.toLocaleString()}</div>
-        <div className="rounded-2xl bg-white p-4 shadow-sm">Users: {users.length}</div>
-        <div className="rounded-2xl bg-white p-4 shadow-sm">Escrow tx: {escrow.id}</div>
+        <div className="rounded-2xl bg-white p-4 shadow-sm">Total users: {users.length}</div>
+        <div className="rounded-2xl bg-white p-4 shadow-sm">Active listings: {products.length}</div>
+        <div className="rounded-2xl bg-white p-4 shadow-sm">Fraud alerts: {fraudFlags().length}</div>
       </section>
 
       <section className="mt-6 rounded-2xl bg-white p-4 shadow-sm">
@@ -43,6 +37,15 @@ export default function AdminPage() {
       </section>
 
       <section className="mt-6 rounded-2xl bg-white p-4 shadow-sm">
+        <h2 className="font-bold">Banned accounts</h2>
+        <ul className="mt-2 space-y-2 text-sm">
+          {bannedAccounts().map((u) => (
+            <li key={u.id} className="rounded bg-slate-50 p-2">{u.id} - {u.reason} ({u.permanent ? 'permanent' : 'temporary'})</li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="mt-6 rounded-2xl bg-white p-4 shadow-sm">
         <h2 className="font-bold">Automated anti-fraud rules</h2>
         <ul className="mt-2 grid grid-cols-1 gap-2 md:grid-cols-2">
           {enforceFraudRules().map((rule) => (
@@ -56,7 +59,17 @@ export default function AdminPage() {
       <section className="mt-6 rounded-2xl bg-white p-4 shadow-sm">
         <h2 className="font-bold">Reception Center status</h2>
         <p className="text-sm text-slate-700">Order {reception.orderId}: {reception.notes}</p>
+        <p className="text-sm text-slate-700">Escrow tx: {escrow.id} ({escrow.status})</p>
         <p className="text-sm text-slate-700">Verified sellers: {sellers.filter((s) => s.verified).length}/{sellers.length}</p>
+      </section>
+
+      <section className="mt-6 rounded-2xl bg-white p-4 shadow-sm">
+        <h2 className="font-bold">Security hardening checklist</h2>
+        <ul className="mt-2 list-disc pl-5 text-sm text-slate-700">
+          {securityChecklist().map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
       </section>
     </main>
   );

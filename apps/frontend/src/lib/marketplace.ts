@@ -77,6 +77,14 @@ export type ReceptionReview = {
   notes: string;
 };
 
+export type ChatMessage = {
+  id: string;
+  from: 'buyer' | 'seller';
+  text: string;
+  timestamp: string;
+  flaggedSpam: boolean;
+};
+
 export const commissionConfig = { min: 0.05, max: 0.1, default: 0.08 };
 
 export const users: User[] = [
@@ -100,105 +108,21 @@ export const users: User[] = [
 ];
 
 export const sellers: Seller[] = [
-  {
-    id: 's1',
-    name: 'NovaTech',
-    rating: 4.8,
-    reviews: 3520,
-    sales: 14800,
-    location: 'Buenos Aires',
-    verified: true,
-    governmentIdVerified: true,
-    phoneVerified: true,
-    fullAddressVerified: true
-  },
-  {
-    id: 's2',
-    name: 'UrbanHome',
-    rating: 4.5,
-    reviews: 1940,
-    sales: 8400,
-    location: 'CDMX',
-    verified: true,
-    governmentIdVerified: true,
-    phoneVerified: true,
-    fullAddressVerified: true
-  },
-  {
-    id: 's3',
-    name: 'EcoStyle',
-    rating: 4.7,
-    reviews: 1220,
-    sales: 5600,
-    location: 'Bogotá',
-    verified: false,
-    governmentIdVerified: false,
-    phoneVerified: true,
-    fullAddressVerified: false
-  }
+  { id: 's1', name: 'NovaTech', rating: 4.8, reviews: 3520, sales: 14800, location: 'Buenos Aires', verified: true, governmentIdVerified: true, phoneVerified: true, fullAddressVerified: true },
+  { id: 's2', name: 'UrbanHome', rating: 4.5, reviews: 1940, sales: 8400, location: 'CDMX', verified: true, governmentIdVerified: true, phoneVerified: true, fullAddressVerified: true },
+  { id: 's3', name: 'EcoStyle', rating: 4.7, reviews: 1220, sales: 5600, location: 'Bogotá', verified: false, governmentIdVerified: false, phoneVerified: true, fullAddressVerified: false }
 ];
 
 export const products: Product[] = [
-  {
-    id: 'p1',
-    title: 'Zentro Phone X1',
-    description: 'Smartphone premium con pantalla OLED 6.7", cámara 108MP y batería de larga duración.',
-    shortDescription: 'OLED 6.7", 256GB, cámara 108MP.',
-    price: 899,
-    category: 'Tecnología',
-    images: ['https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200'],
-    stock: 18,
-    sellerId: 's1',
-    condition: 'new',
-    productRating: 4.7,
-    salesVolume: 7200,
-    views: 54000
-  },
-  {
-    id: 'p2',
-    title: 'AirBuds Pro Z',
-    description: 'Auriculares inalámbricos con cancelación activa de ruido y audio espacial.',
-    shortDescription: 'ANC, estuche con carga rápida.',
-    price: 159,
-    category: 'Tecnología',
-    images: ['https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=1200'],
-    stock: 120,
-    sellerId: 's1',
-    condition: 'new',
-    productRating: 4.6,
-    salesVolume: 9800,
-    views: 63000
-  },
-  {
-    id: 'p3',
-    title: 'Silla ErgoCloud',
-    description: 'Silla ergonómica con soporte lumbar dinámico y malla transpirable.',
-    shortDescription: 'Oficina pro, ajuste 4D.',
-    price: 299,
-    category: 'Hogar',
-    images: ['https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=1200'],
-    stock: 45,
-    sellerId: 's2',
-    condition: 'refurbished',
-    productRating: 4.4,
-    salesVolume: 3100,
-    views: 28000
-  },
-  {
-    id: 'p4',
-    title: 'Chaqueta StormFlex',
-    description: 'Chaqueta impermeable con diseño urbano, ligera y respirable.',
-    shortDescription: 'Impermeable, corte urbano.',
-    price: 89,
-    category: 'Moda',
-    images: ['https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1200'],
-    stock: 78,
-    sellerId: 's3',
-    condition: 'used',
-    productRating: 4.5,
-    salesVolume: 4700,
-    views: 34000
-  }
+  { id: 'p1', title: 'Zentro Phone X1', description: 'Smartphone premium con pantalla OLED 6.7", cámara 108MP y batería de larga duración.', shortDescription: 'OLED 6.7", 256GB, cámara 108MP.', price: 899, category: 'Tecnología', images: ['https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200'], stock: 18, sellerId: 's1', condition: 'new', productRating: 4.7, salesVolume: 7200, views: 54000 },
+  { id: 'p2', title: 'AirBuds Pro Z', description: 'Auriculares inalámbricos con cancelación activa de ruido y audio espacial.', shortDescription: 'ANC, estuche con carga rápida.', price: 159, category: 'Tecnología', images: ['https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=1200'], stock: 120, sellerId: 's1', condition: 'new', productRating: 4.6, salesVolume: 9800, views: 63000 },
+  { id: 'p3', title: 'Silla ErgoCloud', description: 'Silla ergonómica con soporte lumbar dinámico y malla transpirable.', shortDescription: 'Oficina pro, ajuste 4D.', price: 299, category: 'Hogar', images: ['https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=1200'], stock: 45, sellerId: 's2', condition: 'refurbished', productRating: 4.4, salesVolume: 3100, views: 28000 },
+  { id: 'p4', title: 'Chaqueta StormFlex', description: 'Chaqueta impermeable con diseño urbano, ligera y respirable.', shortDescription: 'Impermeable, corte urbano.', price: 89, category: 'Moda', images: ['https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1200'], stock: 78, sellerId: 's3', condition: 'used', productRating: 4.5, salesVolume: 4700, views: 34000 }
+];
+
+export const chatThreads: ChatMessage[] = [
+  { id: 'm1', from: 'buyer', text: 'Hola, ¿el producto es nuevo y sellado?', timestamp: '2026-03-09T10:00:00Z', flaggedSpam: false },
+  { id: 'm2', from: 'seller', text: 'Sí, nuevo y con garantía oficial.', timestamp: '2026-03-09T10:02:00Z', flaggedSpam: false }
 ];
 
 export function getSellerById(id: string) {
@@ -207,6 +131,18 @@ export function getSellerById(id: string) {
 
 export function isValidNationalId(nationalId: string) {
   return /^[A-Z]{2}-\d{7,10}$/.test(nationalId);
+}
+
+export function isStrongPassword(password: string) {
+  return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{10,}$/.test(password);
+}
+
+export function isValidProductImageUrl(url: string) {
+  return /^https:\/\/.+\.(jpg|jpeg|png|webp)(\?.*)?$/i.test(url) || /images\.unsplash\.com/.test(url);
+}
+
+export function validateCaptcha(token: string) {
+  return token.trim().length > 10;
 }
 
 export function canRegisterUser(payload: Pick<User, 'email' | 'nationalId' | 'phone'>) {
@@ -233,12 +169,7 @@ export function recommendations(product: Product) {
   const sameCategory = products.filter((p) => p.id !== product.id && p.category === product.category);
   const similarPrice = products.filter((p) => p.id !== product.id && Math.abs(p.price - product.price) < 120);
   const popular = rankedProducts().filter((p) => p.id !== product.id).slice(0, 4);
-
-  return {
-    related: sameCategory.slice(0, 4),
-    alsoViewed: similarPrice.slice(0, 4),
-    forYou: popular
-  };
+  return { related: sameCategory.slice(0, 4), alsoViewed: similarPrice.slice(0, 4), forYou: popular };
 }
 
 export function calculateCommission(price: number, rate = commissionConfig.default) {
@@ -248,24 +179,27 @@ export function calculateCommission(price: number, rate = commissionConfig.defau
 }
 
 export function createEscrow(orderId: string, buyerId: string, sellerId: string, amount: number): EscrowTransaction {
-  return {
-    id: `escrow-${orderId}`,
-    orderId,
-    buyerId,
-    sellerId,
-    amount,
-    commissionRate: commissionConfig.default,
-    status: 'payment_secured_escrow'
-  };
+  return { id: `escrow-${orderId}`, orderId, buyerId, sellerId, amount, commissionRate: commissionConfig.default, status: 'payment_secured_escrow' };
 }
 
 export function receptionCenterReview(review: ReceptionReview) {
   const approved = review.listingCondition === review.receivedCondition;
-  return {
-    ...review,
-    approved,
-    notes: approved ? 'Condition matches listing. Ship to buyer and release escrow.' : 'Condition mismatch. Return to seller and refund buyer.'
-  };
+  return { ...review, approved, notes: approved ? 'Condition matches listing. Ship to buyer and release escrow.' : 'Condition mismatch. Return to seller and refund buyer.' };
+}
+
+export function shippingTrackingStages(status: EscrowStatus) {
+  const stages = ['Pending Payment', 'Escrow Confirmed', 'Seller Shipment', 'Reception Center Verification', 'Shipped to Buyer', 'Delivered'];
+  const index = ['pending_payment', 'payment_secured_escrow', 'seller_shipping_to_reception', 'verification_in_reception_center', 'shipping_to_buyer', 'delivered'].indexOf(status);
+  return stages.map((name, idx) => ({ name, done: idx <= Math.max(index, 0) }));
+}
+
+export function detectMessageSpam(text: string) {
+  const suspicious = /(http:\/\/|free money|bitcoin now|wa\.me)/i.test(text) || text.length > 400;
+  return suspicious;
+}
+
+export function loginRateLimitExceeded(failedAttempts: number) {
+  return failedAttempts >= 5;
 }
 
 export function fraudFlags() {
@@ -284,4 +218,15 @@ export function enforceFraudRules() {
     { rule: 'seller_wrong_product', action: 'flag_seller' },
     { rule: 'repeated_fraud', action: 'ban_user' }
   ];
+}
+
+export function bannedAccounts() {
+  return [
+    { id: 'u88', reason: 'Fake payment receipts', permanent: true },
+    { id: 's77', reason: 'Repeated false product descriptions', permanent: true }
+  ];
+}
+
+export function securityChecklist() {
+  return ['bcrypt password hashing', 'input validation', 'SQL injection protection', 'XSS protection', 'CSRF protection', 'rate limiting', 'brute-force login protection'];
 }

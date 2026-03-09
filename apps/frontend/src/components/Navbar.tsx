@@ -19,6 +19,7 @@ export function Navbar() {
         <nav className="hidden gap-4 text-sm text-slate-700 md:flex">
           <Link href="/buyer">Comprador</Link>
           <Link href="/dashboard">Vendedor</Link>
+          <Link href="/chat">Chat</Link>
           <Link href="/admin">Admin</Link>
           <Link href="/terms">Términos</Link>
         </nav>
