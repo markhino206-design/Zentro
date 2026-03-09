@@ -277,3 +277,126 @@ export function disputes() {
     { id: 'd2', orderId: 'ord-778', status: 'resolved', reason: 'Late delivery' }
   ];
 }
+
+export type BehaviorEvent = {
+  userId: string;
+  type: 'view' | 'search' | 'add_to_cart' | 'purchase' | 'abandon_cart';
+  productId?: string;
+  category?: string;
+  query?: string;
+  ts: string;
+};
+
+export const behaviorEvents: BehaviorEvent[] = [
+  { userId: 'u1', type: 'view', productId: 'p1', category: 'Tecnología', ts: '2026-03-09T10:00:00Z' },
+  { userId: 'u1', type: 'search', query: 'phone', category: 'Tecnología', ts: '2026-03-09T10:02:00Z' },
+  { userId: 'u1', type: 'add_to_cart', productId: 'p2', category: 'Tecnología', ts: '2026-03-09T10:05:00Z' },
+  { userId: 'u1', type: 'abandon_cart', productId: 'p2', category: 'Tecnología', ts: '2026-03-09T10:20:00Z' }
+];
+
+export function personalizedRecommendations(userId: string) {
+  const userEvents = behaviorEvents.filter((e) => e.userId === userId);
+  const preferredCategories = [...new Set(userEvents.map((e) => e.category).filter(Boolean))] as string[];
+  return rankedProducts().filter((p) => preferredCategories.length === 0 || preferredCategories.includes(p.category)).slice(0, 6);
+}
+
+export function trendingProducts() {
+  return rankedProducts().slice(0, 6);
+}
+
+export function recentlyViewedProducts(productIds: string[]) {
+  return productIds.map((id) => products.find((p) => p.id === id)).filter(Boolean) as Product[];
+}
+
+export function autocompleteSuggestions(input: string) {
+  const q = input.toLowerCase();
+  if (!q) return [];
+  return products
+    .map((p) => p.title)
+    .filter((t) => t.toLowerCase().includes(q))
+    .slice(0, 5);
+}
+
+export function searchHistoryForUser(userId: string) {
+  return behaviorEvents.filter((e) => e.userId === userId && e.type === 'search').map((e) => e.query).filter(Boolean) as string[];
+}
+
+export function trendingSearches() {
+  return ['iphone', 'notebook gamer', 'silla ergonómica', 'auriculares bluetooth', 'smart tv'];
+}
+
+export function intelligentRankingScore(product: Product) {
+  const base = calculateRankingScore(product);
+  const conversionRate = product.salesVolume / Math.max(product.views, 1);
+  const trustBoost = (getSellerById(product.sellerId)?.verified ? 1.1 : 0.9) * product.productRating;
+  return base + conversionRate * 10000 + trustBoost * 200;
+}
+
+export function aiRankedProducts() {
+  return [...products].sort((a, b) => intelligentRankingScore(b) - intelligentRankingScore(a));
+}
+
+export function detectFraudAI() {
+  return [
+    { id: 'af1', risk: 0.92, actor: 'seller:s3', reason: 'Repeated disputes + condition mismatch', action: 'freeze payouts' },
+    { id: 'af2', risk: 0.78, actor: 'buyer:u44', reason: 'Suspicious payment retries', action: 'manual verification' },
+    { id: 'af3', risk: 0.66, actor: 'review_cluster:r99', reason: 'Fake review language pattern', action: 'review moderation' }
+  ];
+}
+
+export function analyzeReviewAI(review: string) {
+  const spam = /(great great great|buy now|http:\/\/|wa\.me)/i.test(review);
+  const abusive = /(idiot|scammer|stupid)/i.test(review);
+  return { spam, abusive, flagged: spam || abusive };
+}
+
+export function reputationScore(sellerId: string) {
+  const seller = getSellerById(sellerId);
+  if (!seller) return 0;
+  const complaints = fraudFlags().filter((f) => f.entity === `seller:${sellerId}`).length;
+  return Math.max(0, seller.rating * 20 + Math.min(seller.sales / 200, 20) - complaints * 8);
+}
+
+export function marketplaceInsights() {
+  return {
+    trendingProducts: trendingProducts().map((p) => p.title),
+    fastestGrowingCategories: ['Tecnología', 'Hogar Inteligente', 'Moda Deportiva'],
+    buyerDemandPatterns: ['Mobile high intent at night', 'Price-sensitive in weekdays', 'High conversion with verified sellers']
+  };
+}
+
+export function receptionCenters() {
+  return [
+    { id: 'rc1', city: 'Buenos Aires', lat: -34.6037, lng: -58.3816 },
+    { id: 'rc2', city: 'São Paulo', lat: -23.5505, lng: -46.6333 },
+    { id: 'rc3', city: 'Ciudad de México', lat: 19.4326, lng: -99.1332 }
+  ];
+}
+
+export function nearestReceptionCenter(lat: number, lng: number) {
+  const centers = receptionCenters();
+  let best = centers[0];
+  let bestD = Number.POSITIVE_INFINITY;
+  for (const c of centers) {
+    const d = Math.hypot(c.lat - lat, c.lng - lng);
+    if (d < bestD) {
+      bestD = d;
+      best = c;
+    }
+  }
+  return best;
+}
+
+export function aiShippingOptimizer(distanceKm: number, weightKg: number) {
+  const quote = logisticsQuote(distanceKm, weightKg);
+  const etaDays = Math.max(1, Math.round(distanceKm / 220 + weightKg / 8));
+  return { ...quote, etaDays, routeQuality: distanceKm < 400 ? 'fast-lane' : 'standard' };
+}
+
+export function supportBotReply(question: string) {
+  const q = question.toLowerCase();
+  if (q.includes('refund')) return 'Tu reembolso se procesa automáticamente si Reception Center rechaza el producto.';
+  if (q.includes('escrow')) return 'El pago se retiene en escrow hasta verificar condición y entrega.';
+  if (q.includes('publish') || q.includes('publicar')) return 'Para publicar debes verificar identidad y pagar la tarifa de listing de $2 USD.';
+  return 'Hola, soy Zentro AI Support. Puedo ayudarte con órdenes, pagos, publicación y disputas.';
+}

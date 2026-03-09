@@ -24,6 +24,8 @@ export function Navbar() {
           <Link href="/chat">{t('chat')}</Link>
           <Link href="/search">Search</Link>
           <Link href="/disputes">Disputes</Link>
+          <Link href="/support">AI Support</Link>
+          <Link href="/reception-map">Reception Map</Link>
           <Link href="/terms">{t('terms')}</Link>
           <Link href="/account">My Account</Link>
         </nav>

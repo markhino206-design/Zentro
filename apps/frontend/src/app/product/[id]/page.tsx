@@ -1,6 +1,7 @@
 'use client';
 
 import { notFound, useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { ProductGallery } from '../../../components/ProductGallery';
 import { SellerCard } from '../../../components/SellerCard';
 import { ProductCard } from '../../../components/ProductCard';
@@ -13,6 +14,13 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   const { addToCart } = useCart();
 
   if (!product) return notFound();
+
+  useEffect(() => {
+    const raw = localStorage.getItem('zentro_recently_viewed');
+    const list = raw ? (JSON.parse(raw) as string[]) : [];
+    const next = [product.id, ...list.filter((id) => id !== product.id)].slice(0, 12);
+    localStorage.setItem('zentro_recently_viewed', JSON.stringify(next));
+  }, [product.id]);
 
   const seller = getSellerById(product.sellerId);
   if (!seller) return notFound();
